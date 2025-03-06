@@ -141,7 +141,7 @@
 		
         @media (max-width: 600px) {
             .nav-buttons a {padding: 8px 15px; font-size: 18px;}
-            .nav-right a {padding: 3px 8px; font-size: 14px;}
+            .nav-right a {padding: 3px 8px; font-size: 16px;}
 			.text_a_img {font-size: 18px;}
 			main h1 {font-size: 25px;}
 			.hlavni {font-size: 18px;}
