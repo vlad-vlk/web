@@ -1,0 +1,142 @@
+* {margin: 0; padding: 0; box-sizing: border-box;}
+		
+		html {background: #e6fafc;}
+		
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+			max-width: 600px;
+			margin: auto;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #333;
+            padding: 10px 20px;
+        }
+        .nav-left {
+            display: flex;
+        }
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 140px;
+			text-align: center;
+        }
+        .nav-buttons a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            background-color: #555;
+			box-shadow: 5px 5px 5px black;
+            font-size: 20px;
+            border-radius: 5px;
+        }
+        .nav-buttons a:hover {
+            background-color: #777;
+        }
+        .nav-right {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .nav-right a {
+            text-decoration: none;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #666;
+			box-shadow: 5px 5px 5px black;
+            border-radius: 3px;
+        }
+        .nav-right a:hover {background-color: #888;}
+		
+        main {flex: 1;padding: 5px;}
+		
+		.hlavni {
+			line-height: 35px;
+			width: 95%;
+			margin: auto;
+			padding-top: 30px;
+			font-style: italic;
+			font-size: 20px;
+		}
+		
+		.hlavni img {
+			width: 35px;
+			transform: translateY(8px);
+		}
+        main h1 {
+            margin-bottom: 10px;
+			text-align: center;
+			font-size: 30px;
+        }
+		
+		.kontakt {
+			width: 95%;
+			border: solid 3px red;
+			border-radius: 8px;
+			background: linear-gradient(#99f5ff, pink);
+			margin: auto;
+			padding: 20px 5px;
+			box-shadow: 5px 5px 5px black;
+			
+		}
+						
+				        		
+		.text_a_img img {
+            float: left;  /* Изображение будет слева */
+            margin: 5px 10px 5px 5px;  /* Отступы вокруг изображения: сверху, справа, снизу */
+            width: 100px;  /* Ширина изображения */
+            border-radius: 8px;  /* Скругление углов для красивого вида */
+			box-shadow: 5px 5px 5px black;
+        }
+
+        .text_a_img {
+            overflow: hidden;  /* Чтобы контейнер автоматически подстраивался под содержимое */
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            font-size: 18px;
+			box-shadow: 5px 5px 5px black;
+			border-radius: 8px;
+			background: #f5f590;
+			background: linear-gradient(to right, #efffc2, #7a83fa);
+			padding-left: 5px;
+			margin-bottom: 15px;
+        }
+    
+			
+		.contact-info {margin: 20px 0;}
+        .contact-item {margin-bottom: 15px;}
+        .contact-item a {color: blue; text-decoration: none;}
+        .contact-item a:hover {text-decoration: underline;}
+		
+		table {
+			width: 95%;	
+			border-collapse: collapse;
+			border: solid 4px black;
+			margin: auto;
+			margin-bottom: 20px;
+			background: linear-gradient(to right, #9afc88, #e3fce6);
+		}
+		
+		th, td {
+			padding: 10px;
+			border: solid 2px black;
+		}
+		
+		th:nth-child(1), td:nth-child(1) {width: 70%;}
+		th:nth-child(2), td:nth-child(2) {width: 30%; text-align: center;}
+		
+		
+        @media (max-width: 600px) {
+            .nav-buttons a {padding: 8px 15px; font-size: 16px;}
+            .nav-right a {padding: 3px 8px; font-size: 12px;}
+			.text_a_img {font-size: 16px;}
+			main h1 {font-size: 25px;}
+			.hlavni {font-size: 17px;}
+        }
