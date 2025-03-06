@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEB Vlad PC</title>
     <link rel="stylesheet" href="style.css">
+	<link rel="icon" type="image/png" href="img/favicon.png">
 </head>
 <body>
 	<nav>
@@ -16,8 +17,8 @@
 			</div>
 		</div>	
 		<div class="nav-right">
-			<a href="#" id="btn-lang-cs" onclick="changeLanguage('cs')">Cz</a>
-			<a href="#" id="btn-lang-uk" onclick="changeLanguage('uk')">Укр</a>
+			<a href="#" id="btn-lang-cs" onclick="changeLanguage('cs')"><img src="img/cz.svg">Cz</a>
+			<a href="#" id="btn-lang-uk" onclick="changeLanguage('uk')"><img src="img/ua.svg">Укр</a>
 		</div>
 	</nav>
 	<main><div id="kontent"></div></main>
@@ -41,8 +42,8 @@ const slovnyk = {
             hlavni: "Головна",
             ceny: "Ціна",
             kontakt: "Контакти",
-            langUk: "Укр",
-            langCs: "Cz"
+            langUk: '<img src="img/ua.svg">Укр',
+            langCs: '<img src="img/cz.svg">Cz'
         }
     },
 	
@@ -63,8 +64,8 @@ const slovnyk = {
             hlavni: "Hlavni",
             ceny: "Ceny",
             kontakt: "Kontakt",
-            langUk: "Ukr",
-            langCs: "Cz"
+            langUk: '<img src="img/ua.svg">Ukr',
+            langCs: '<img src="img/cz.svg">Cz'
         }
     }
 };
@@ -182,13 +183,13 @@ function updateNav() {
     const buttons = slovnyk[jazyk].buttons;
 
     // Оновлюємо кнопки навігації
-    document.getElementById("btn-hlavni").textContent = buttons.hlavni;
-    document.getElementById("btn-ceny").textContent = buttons.ceny;
-    document.getElementById("btn-kontakt").textContent = buttons.kontakt;
+    document.getElementById("btn-hlavni").innerHTML = buttons.hlavni;
+    document.getElementById("btn-ceny").innerHTML = buttons.ceny;
+    document.getElementById("btn-kontakt").innerHTML = buttons.kontakt;
 
     // Оновлюємо кнопки перемикання мови
-    document.getElementById("btn-lang-uk").textContent = buttons.langUk;
-    document.getElementById("btn-lang-cs").textContent = buttons.langCs;
+    document.getElementById("btn-lang-uk").innerHTML = buttons.langUk;
+    document.getElementById("btn-lang-cs").innerHTML = buttons.langCs;
 }
 
 function updatePage() {

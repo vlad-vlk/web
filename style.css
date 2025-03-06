@@ -28,12 +28,13 @@
 			text-align: center;
         }
         .nav-buttons a {
+			
             text-decoration: none;
             color: white;
             padding: 10px 20px;
             background-color: #555;
 			box-shadow: 5px 5px 5px black;
-            font-size: 20px;
+            font-size: 22px;
             border-radius: 5px;
         }
         .nav-buttons a:hover {
@@ -45,14 +46,19 @@
             gap: 10px;
         }
         .nav-right a {
+            display: flex;
+            align-items: center; /* Вирівнює текст і картинку по вертикалі */
+            gap: 5px; /* Відступ між картинкою та текстом */
             text-decoration: none;
             color: white;
             padding: 5px 10px;
-            font-size: 14px;
+            font-size: 16px;
             background-color: #666;
 			box-shadow: 5px 5px 5px black;
             border-radius: 3px;
         }
+		.nav-right a img{width: 30px;}
+		
         .nav-right a:hover {background-color: #888;}
 		
         main {flex: 1;padding: 5px;}
@@ -134,9 +140,9 @@
 		
 		
         @media (max-width: 600px) {
-            .nav-buttons a {padding: 8px 15px; font-size: 16px;}
-            .nav-right a {padding: 3px 8px; font-size: 12px;}
-			.text_a_img {font-size: 16px;}
+            .nav-buttons a {padding: 8px 15px; font-size: 18px;}
+            .nav-right a {padding: 3px 8px; font-size: 14px;}
+			.text_a_img {font-size: 18px;}
 			main h1 {font-size: 25px;}
-			.hlavni {font-size: 17px;}
+			.hlavni {font-size: 18px;}
         }
