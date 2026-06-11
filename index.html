@@ -1,234 +1,125 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEB Vlad PC</title>
-    <link rel="stylesheet" href="style.css">
-	<link rel="icon" type="image/png" href="img/favicon.png">
-	
-	<meta property="og:title" content="Instalace/Установка: Windows, Linux, Office, ...">
-    <meta property="og:description" content="Копіювання чіпів/Kopírování čipů. Чищення ноутбуків (і термопаста)/Čištění PC (a termopasta)...">
-    <meta property="og:image" content="https://vlad-vlk.github.io/web/img/linux.png">
-    <meta property="og:url" content="https://vlad-vlk.github.io/web">
-    <meta property="og:type" content="website">
+    <title>Sledování obličeje</title>
 
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        video, canvas {
+            width: 800px;
+            max-width: 100vw;
+            border-radius: 12px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-	<nav>
-		<div class="nav-left">
-			<div class="nav-buttons">
-				<a href="#" id="btn-hlavni" onclick="changePage('hlavni')">Головна</a>
-				<a href="#" id="btn-ceny" onclick="changePage('ceny')">Ціна</a>
-				<a href="#" id="btn-kontakt" onclick="changePage('kontakt')">Контакти</a>	
-			</div>
-		</div>	
-		<div class="nav-right">
-			<a href="#" id="btn-lang-cs" onclick="changeLanguage('cs')"><img src="img/cz.svg">Cz</a>
-			<a href="#" id="btn-lang-uk" onclick="changeLanguage('uk')"><img src="img/ua.svg">Укр</a>
-		</div>
-	</nav>
-	<main><div id="kontent"></div></main>
-    <script>
-	
-const slovnyk = {
-    uk: {
-     
-		kontaktTitle: "Проживаю в Празі.<br><br>Звязатися зі мною можна через:",
-		hlavniTitle: "Вітаю.",
-		hlavniUvod: `<img src="img/go.svg"> На цьому веб-сайті я хочу запропонувати свої маленькі послуги, які можуть комусь дуже допоможуть. Це моє хобі, роблю це як додатковий заробіток. Тут ви знайдете перелік деяких служб та їх приблизні ціни. Звичайно, про все ще можна домовитися.<br><br> <img src="img/tel.svg"> <img src="img/email.svg"> <img src="img/w.svg"> Контакти на мене знайдете під кнопкою Контакт. Не зволікайте запитувати , я постараюся відповісти якнайшвидше. Як я вже писав, це не моя основна робота, але я майже завжди на звязку.`,
-		_1: ['Установка операційної системи.', 'Роблю переінсталяцію або чисту інсталяцію таких операційних систем, як Windows (8, 10, 11), Linux (Manjaro, Ubuntu, Lubuntu, Mint, ...)'],
-		_2: [' Чищення ноутбуків (і термопаста).', 'Чищення ноутбуків і РС віт пороху. <br><br>Заміну термопасти під охолоджувальними системами.'],
-		_3: [' Драйвери і програми.', 'Інсталяція / переінсталяція драйверів, інших важливих програм.'],
-		_4: ['Інструктаж', 'Дам інструкцію по роботі з компютером, телефоном.<br><br> Також допоможу розібратися, як працювати на тій чи іншій програмі.'],
-		_5: [' Копіювання чіпів.', 'Можу зкопіювати дверні чіпи (гаражні та інші).<br><br> Не всі чіпи можна зкопіювати, але так 80% можна.'],
-			
-		cenyTitle: ['Приблизні ціни.', 'Ціну завжди можна договорити.......', 'Робота', 'Ціна'],
-		
-        buttons: {
-            hlavni: "Головна",
-            ceny: "Ціна",
-            kontakt: "Контакти",
-            langUk: '<img src="img/ua.svg">Укр',
-            langCs: '<img src="img/cz.svg">Cz'
+
+<div class="container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+</div>
+
+<script type="module">
+import {
+    FaceDetector,
+    FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+async function start() {
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
+
+    video.srcObject = stream;
+
+    await new Promise(resolve => {
+        video.onloadedmetadata = resolve;
+    });
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+    );
+
+    const detector = await FaceDetector.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath:
+                "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite"
+        },
+        runningMode: "VIDEO"
+    });
+
+    async function detect() {
+        const now = performance.now();
+
+        const result = detector.detectForVideo(video, now);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (result.detections) {
+            result.detections.forEach(face => {
+
+                const box = face.boundingBox;
+
+                ctx.strokeStyle = "#00ff00";
+                ctx.lineWidth = 4;
+                ctx.strokeRect(
+                    box.originX,
+                    box.originY,
+                    box.width,
+                    box.height
+                );
+
+                ctx.fillStyle = "#00ff00";
+                ctx.font = "20px Arial";
+                ctx.fillText(
+                    "Obličej",
+                    box.originX,
+                    box.originY - 10
+                );
+            });
         }
-    },
-	
-    cs: {
-        	
-		kontaktTitle: "Bydlim v Praze.<br><br> Spojit se se mnou je možné přes: ",
-		hlavniTitle: "Vítám.",
-		hlavniUvod: `<img src="img/go.svg"> Na tomhle webu chci nabídnout sve malé služby, které určitě někomu moc pomůžou. Je to muj koníček, delam to jako přivýdělek. Najdete tady seznam nějakých akcí a přibližné ceny k ním. Samozřejmě všechno se da ještě domluvit.<br><br> <img src="img/tel.svg"> <img src="img/email.svg"> <img src="img/w.svg"> Kontakty na mně najděte pod tlačítkem Kontakt. Neváhejte se na neco zeptat, budu se snažit co nejdříve odpovědět. Jak už jsem psal, neni to moje hlavní zaměstnání, ale na příjmu jsem skoro vždycky.`,
-		_1: [' Instalace operačního systému.', 'Dělám přeinstalace nebo čistou instalaci takových operačních systémů, jak Windows (8, 10, 11), Linux (Manjaro, Ubuntu, Lubuntu, Mint, ...)'],
-		_2: [' Čištění PC (a termopasta)', 'Čištění notebooků a PC od prachu.<br><br> Vymena termopasty pod chladicími systémy.'],
-		_3: [' Ovladače a aplikace.', 'Instalace / přeinstalace ovladačů, jiných důležitých aplikací.'],
-		_4: [' Zaškolení.', 'Proškolim, jak pravovat s počítačem nebo telefonem.<br><br> Taký vysvětlím, jak používat tu nebo jinou aplikaci.'],
-		_5: [' Kopírování čipů.', 'Můžu udelat kopii domovních čipů ( garážových, ...).<br><br> Ne všichni čipy se dají kopírovat, ale 80% jde.'],
-			
-		cenyTitle: ['Přibližné ceny.', 'Ceny se dají domluvit', 'Úkol', 'Cena'],
-		
-        buttons: {
-            hlavni: "Hlavni",
-            ceny: "Ceny",
-            kontakt: "Kontakt",
-            langUk: '<img src="img/ua.svg">Ukr',
-            langCs: '<img src="img/cz.svg">Cz'
-        }
+
+        requestAnimationFrame(detect);
     }
-};
 
-function hlavniHtml(hlavniTitle, hlavniUvod, _1, _2, _3, _4, _5){
-	let cod = `<div class="hlavni">
-        <h1> ${hlavniTitle} </h1><br>
-		<h1><img src="img/android.svg">&nbsp&nbsp&nbsp<img src="img/win.svg">&nbsp&nbsp&nbsp<img src="img/linux.svg"> </h1>
-		<p>${hlavniUvod}</p><br>
-		
-		<div class="o_nas">
-			<div class="text_a_img">
-				<h3>1. ${ _1[0] }</h3>
-    			<img alt="" src="img/win.png">
-				<img style="float: right;" alt="" src="img/linux.png">
-				<p>${ _1[1] }</p>
-			</div>			
-			<div class="text_a_img">
-				<h3>2. ${ _2[0] }</h3>
-    			<img alt="" src="img/clin1.png">
-				<img style="float: right;" alt="" src="img/clin2.png">
-				<p>${ _2[1] }</p>
-			</div>
-			<div class="text_a_img">
-				<h3>3. ${ _3[0] }</h3>
-				<img style="float: right; width: 150px;" alt="" src="img/app.png">
-				<p>${ _3[1] }</p>
-			</div>			
-			<div class="text_a_img">
-				<h3>4. ${ _4[0] }</h3>
-				<img alt="" src="img/skola.png" style="width: 130px;">
-				<p>${ _4[1] }</p>
-			</div>			
-			<div class="text_a_img">
-				<h3>5. ${ _5[0] }</h3>
-				<img alt="" src="img/rfid.png" style="width: 150px;">
-    			<p>${ _5[1] }</p>
-			</div>			
-        </div>`;
-	return cod;
+    detect();
 }
 
-function kontaktHtml(kontaktTitle){
-	let cod = `<div class="kontakt">
-        <h3> ${kontaktTitle} </h3><br>				
-		<div class="contact-info">
-        	<div class="contact-item">
-            	📞 <strong>Tel:</strong> <a href="tel:+420773878332">+420 773 878 332</a>
-        	</div>
-        	<div class="contact-item">
-            	✉️ <strong>Email:</strong> <a href="mailto:vlad.brynyak@gmail.com">vlad.brynyak@gmail.com</a>
-        	</div>
-        	<div class="contact-item">
-            	💬 <strong>WhatsApp:</strong> <a href="https://wa.me/420773878332">+420773878332</a>
-        	</div>
-    	</div>
-		</div>`;
-	return cod;
-}
+start().catch(err => {
+    console.error(err);
+    alert("Nepodařilo se spustit kameru.");
+});
+</script>
 
-function cenyHtml (cenyTitle, _1, _2, _3, _4, _5){
-	let cod = `<h1>${cenyTitle[0]}</h1>
-		<div class="o_nas">
-			<div class="text_a_img">
-    			<h3>${cenyTitle[1]}</h3><br>
-				<table>
-					<tr>
-						<th>${cenyTitle[2]}</th>
-						<th>${cenyTitle[3]}</th>
-					</tr>
-					<tr>
-						<td>${_1[0]}</td>
-						<td>500 Kč</td>
-					</tr>
-					<tr>
-						<td>${_2[0]}</td>
-						<td>400 Kč</td>
-					</tr>
-					<tr>
-						<td>${_3[0]}</td>
-						<td>${ jazyk == 'cs' ? 'Domluva' : 'Договірна' }</td>
-					</tr>
-					<tr>
-						<td>${_4[0]}</td>
-						<td>${ jazyk == 'cs' ? '250 Kč/hod' : '250 Kč/год' }</td>
-					</tr>
-					<tr>
-						<td>${_5[0]}</td>
-						<td>${ jazyk == 'cs' ? '200 Kč/kus' : '200 Kč/шт' }</td>
-					</tr>
-					<tr>
-				</table>
-			</div>
-        </div>`;
-	return cod;
-}
-
-
-let jazyk = "uk";
-let stranka = "hlavni";
-
-function changePage(page) {
-    stranka = page;
-    updateNav();
-	updatePage()
-}
-
-function changeLanguage(lang) {
-    jazyk = lang;
-    updateNav();
-	updatePage()
-}
-
-function updateNav() {
-    const buttons = slovnyk[jazyk].buttons;
-
-    // Оновлюємо кнопки навігації
-    document.getElementById("btn-hlavni").innerHTML = buttons.hlavni;
-    document.getElementById("btn-ceny").innerHTML = buttons.ceny;
-    document.getElementById("btn-kontakt").innerHTML = buttons.kontakt;
-
-    // Оновлюємо кнопки перемикання мови
-    document.getElementById("btn-lang-uk").innerHTML = buttons.langUk;
-    document.getElementById("btn-lang-cs").innerHTML = buttons.langCs;
-}
-
-function updatePage() {
-	let content = '';
-	
-	if (stranka == 'kontakt') {
-		content = kontaktHtml(slovnyk[jazyk].kontaktTitle);
-	} else if (stranka == 'hlavni') {
-		hlavniTitle = slovnyk[jazyk].hlavniTitle;
-		hlavniUvod = slovnyk[jazyk].hlavniUvod;
-		_1 = slovnyk[jazyk]._1;
-		_2 = slovnyk[jazyk]._2;
-		_3 = slovnyk[jazyk]._3;
-		_4 = slovnyk[jazyk]._4;
-		_5 = slovnyk[jazyk]._5;
-		
-		content = hlavniHtml(hlavniTitle, hlavniUvod, _1, _2, _3, _4, _5);
-	} else {
-		cenyTitle = slovnyk[jazyk].cenyTitle;
-		_1 = slovnyk[jazyk]._1;
-		_2 = slovnyk[jazyk]._2;
-		_3 = slovnyk[jazyk]._3;
-		_4 = slovnyk[jazyk]._4;
-		_5 = slovnyk[jazyk]._5;
-		content = cenyHtml(cenyTitle, _1, _2, _3, _4, _5);
-	}
-
-    document.getElementById("kontent").innerHTML = content;
-}
-
-updatePage()
-
-	</script>
 </body>
 </html>
