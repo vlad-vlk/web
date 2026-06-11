@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sledování obličeje</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        video, canvas {
+            width: 800px;
+            max-width: 100vw;
+            border-radius: 12px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+</div>
+
+<script type="module">
+import {
+    FaceDetector,
+    FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+async function start() {
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
+
+    video.srcObject = stream;
+
+    await new Promise(resolve => {
+        video.onloadedmetadata = resolve;
+    });
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+    );
+
+    const detector = await FaceDetector.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath:
+                "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite"
+        },
+        runningMode: "VIDEO"
+    });
+
+    async function detect() {
+        const now = performance.now();
+
+        const result = detector.detectForVideo(video, now);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (result.detections) {
+            result.detections.forEach(face => {
+
+                const box = face.boundingBox;
+
+                ctx.strokeStyle = "#00ff00";
+                ctx.lineWidth = 4;
+                ctx.strokeRect(
+                    box.originX,
+                    box.originY,
+                    box.width,
+                    box.height
+                );
+
+                ctx.fillStyle = "#00ff00";
+                ctx.font = "20px Arial";
+                ctx.fillText(
+                    "Obličej",
+                    box.originX,
+                    box.originY - 10
+                );
+            });
+        }
+
+        requestAnimationFrame(detect);
+    }
+
+    detect();
+}
+
+start().catch(err => {
+    console.error(err);
+    alert("Nepodařilo se spustit kameru.");
+});
+</script>
+
+</body>
+</html>
